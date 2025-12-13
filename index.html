@@ -83,9 +83,10 @@
 
         .logo {
             font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--color-secondary);
+            display: flex;
+            align-items: center;
         }
+
 
         h1 {
             font-size: 1.8rem;
@@ -226,8 +227,8 @@
         }
 
         .tab-item svg {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             margin-bottom: 3px;
             stroke-width: 2.5;
         }
@@ -435,7 +436,9 @@
 
 <div class="app-container">
     <div class="header">
-        <div class="logo">DAAD Manager</div>
+        <div class="logo">
+            <img src="https://i.ibb.co/spk67RPK/image.png" alt="DAAD Manager Logo" style="height: 40px;">
+        </div>
         <div class="header-actions">
             <button class="glass-btn btn-primary" onclick="requestNotificationPermission()">
                 <i data-feather="bell"></i>
