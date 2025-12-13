@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAAD Manager</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/JRdPfZF3/image.png">
+    <style>
+        /* -------------------------------------------------------------------
+        * IDENTITY & GLOBAL STYLES
+        * Primary: #501323 (Deep Maroon)
+        * Secondary: #E0D6BC (Sandy Beige)
+        * Text: #F2E8D8 (Off-White Beige)
+        * ------------------------------------------------------------------- */
+        :root {
+            --color-primary: #501323;
+            --color-secondary: #E0D6BC;
+            --color-text: #F2E8D8;
+            --color-glass-bg: rgba(224, 214, 188, 0.15); /* Light semi-transparent glass */
+            --color-dark-glass-bg: rgba(80, 19, 35, 0.6); /* Dark semi-transparent glass for depth */
+            --radius-xl: 28px;
+            --radius-lg: 20px;
+            --shadow-soft: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            --shadow-inset: inset 0 0 0 1px rgba(242, 232, 216, 0.1);
+            font-family: 'Inter', sans-serif;
+            color: var(--color-text);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--color-primary) 0%, #300a16 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        /* -------------------------------------------------------------------
+        * GLASSMORHISM UI ELEMENTS
+        * ------------------------------------------------------------------- */
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .glass-card, .glass-section, .glass-panel {
+            background: var(--color-glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(242, 232, 216, 0.1);
+            box-shadow: var(--shadow-soft), var(--shadow-inset);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.3), var(--shadow-inset);
+        }
+
+        /* Headers and Titles */
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--color-dark-glass-bg);
+            border-bottom: 1px solid rgba(242, 232, 216, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-secondary);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--color-text);
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(242, 232, 216, 0.1);
+            padding-bottom: 5px;
+            text-align: left; /* Changed alignment for LTR */
+        }
+
+        /* Buttons and Inputs */
+        .glass-btn, button, input[type="submit"] {
+            background: linear-gradient(45deg, var(--color-secondary) 50%, #f7e9c5 100%);
+            color: var(--color-primary);
+            padding: 10px 18px;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+            box-shadow: 0 4px 10px rgba(80, 19, 35, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .glass-btn:hover, button:hover, input[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(80, 19, 35, 0.5);
+        }
+
+        .glass-btn:active, button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(80, 19, 35, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--color-primary) 0%, #7e1e36 100%);
+            color: var(--color-text);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-delete {
+            background: linear-gradient(45deg, #FF6B6B 0%, #E63946 100%);
+            color: white;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(242, 232, 216, 0.05);
+            color: var(--color-text);
+            box-sizing: border-box;
+            font-size: 1rem;
+            border: 1px solid rgba(242, 232, 216, 0.15);
+            transition: background-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            background: rgba(242, 232, 216, 0.1);
+            box-shadow: 0 0 0 2px var(--color-secondary);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--color-secondary);
+            font-weight: 500;
+            text-align: left; /* Changed alignment for LTR */
+        }
+
+        /* -------------------------------------------------------------------
+        * LAYOUT & NAVIGATION
+        * ------------------------------------------------------------------- */
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .page {
+            display: none;
+            min-height: 100%;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Bottom Tab Bar */
+        .tab-bar {
+            background: var(--color-dark-glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(242, 232, 216, 0.1);
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-around;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: color 0.2s, background-color 0.2s;
+            border-radius: 10px;
+            color: rgba(242, 232, 216, 0.5);
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .tab-item.active {
+            color: var(--color-secondary);
+        }
+
+        .tab-item:hover {
+            color: var(--color-secondary);
+        }
+
+        .tab-item svg {
+            width: 20px;
+            height: 20px;
+            margin-bottom: 3px;
+            stroke-width: 2.5;
+        }
+
+        /* -------------------------------------------------------------------
+        * CLIENT LIST & PROFILE STYLES
+        * ------------------------------------------------------------------- */
+        .client-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .client-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--color-glass-bg);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+        }
+
+        .client-item:hover {
+            background: rgba(224, 214, 188, 0.25);
+        }
+
+        .client-info h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--color-text);
+        }
+
+        .client-info p {
+            margin: 3px 0 0 0;
+            font-size: 0.85rem;
+            color: var(--color-secondary);
+            opacity: 0.7;
+        }
+
+        .client-status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-lead { background: #FFC107; color: var(--color-primary); }
+        .status-active { background: #2196F3; color: white; }
+        .status-inactive { background: #F44336; color: white; }
+        .status-successful-sale { background: #4CAF50; color: white; }
+
+        .client-profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            text-align: left; /* Changed alignment for LTR */
+        }
+
+        .client-avatar {
+            width: 70px;
+            height: 70px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-secondary);
+            margin-right: 20px; /* Changed margin direction */
+            flex-shrink: 0;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            text-align: left; /* Changed alignment for LTR */
+        }
+
+        .tag {
+            background: var(--color-dark-glass-bg);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: var(--color-secondary);
+        }
+
+        .interaction-log {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .interaction-item {
+            background: var(--color-dark-glass-bg);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .interaction-item span {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* -------------------------------------------------------------------
+        * TASK MANAGEMENT STYLES
+        * ------------------------------------------------------------------- */
+        .task-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: var(--color-glass-bg);
+            border-radius: var(--radius-lg);
+            border-left: 4px solid var(--color-secondary); /* Changed border direction */
+            transition: all 0.2s;
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            border-left: 4px solid #4CAF50; /* Changed border direction */
+        }
+
+        .task-info {
+            flex-grow: 1;
+            margin: 0 15px;
+            text-align: left; /* Changed alignment for LTR */
+        }
+
+        .task-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+            text-decoration: none;
+            color: var(--color-text);
+        }
+
+        .task-info p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--color-secondary);
+            opacity: 0.8;
+        }
+
+        .task-action button {
+            padding: 5px 10px;
+            margin-left: 5px; /* Changed margin direction */
+        }
+
+        /* -------------------------------------------------------------------
+        * ANALYTICS & NOTIFICATIONS
+        * ------------------------------------------------------------------- */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            padding: 10px;
+        }
+
+        /* Utility/Responsive */
+        .flex-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .flex-row > * {
+            flex-grow: 1;
+        }
+        @media (max-width: 768px) {
+            .app-container {
+                min-height: 100vh;
+                border-radius: 0;
+                max-width: 100%;
+            }
+            body {
+                padding: 0;
+                align-items: stretch;
+            }
+            .content {
+                padding: 15px;
+            }
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <div class="logo">DAAD Manager</div>
+        <div class="header-actions">
+            <button class="glass-btn btn-primary" onclick="requestNotificationPermission()">
+                <i data-feather="bell"></i>
+                <span id="permission-status">Notifications: Off</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="content">
+
+        <!-- -------------------------------------------------------------------
+        * 1. DASHBOARD PAGE
+        * ------------------------------------------------------------------- -->
+        <div class="page active" data-page="dashboard">
+            <h1>Dashboard</h1>
+            <p style="color: var(--color-secondary);">Welcome back. Your client management system is ready.</p>
+
+            <div class="glass-section grid-3">
+                <div class="glass-card">
+                    <h2>Total Clients</h2>
+                    <p id="total-clients-stat" style="font-size: 2.5rem; font-weight: 700; color: var(--color-secondary);">0</p>
+                </div>
+                <div class="glass-card">
+                    <h2>Pending Tasks</h2>
+                    <p id="pending-tasks-stat" style="font-size: 2.5rem; font-weight: 700; color: #FFC107;">0</p>
+                </div>
+                <div class="glass-card">
+                    <h2>Sales Logged</h2>
+                    <p id="sales-logged-stat" style="font-size: 2.5rem; font-weight: 700; color: #4CAF50;">0</p>
+                </div>
+            </div>
+
+            <div class="glass-section">
+                <h2>Active Clients (Top 5)</h2>
+                <div class="client-list" id="quick-clients-list">
+                    <!-- Client items will be injected here -->
+                    <!-- The no-clients-msg element was removed from here and is now handled dynamically in renderDashboard to fix the error. -->
+                </div>
+                <button class="glass-btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="navigate('add-client')">
+                    <i data-feather="user-plus"></i> Add New Client
+                </button>
+            </div>
+        </div>
+
+        <!-- -------------------------------------------------------------------
+        * 2. CLIENT MANAGEMENT PAGE
+        * ------------------------------------------------------------------- -->
+        <div class="page" data-page="client-list">
+            <h1>Client Management</h1>
+            <div class="glass-section">
+                <div class="flex-row">
+                    <input type="text" id="client-search" placeholder="Search by name, phone, or tag (#VIP)..." oninput="renderClientList()">
+                    <select id="client-filter-status" onchange="renderClientList()">
+                        <option value="">All Statuses</option>
+                        <option value="Lead">Prospective Lead</option>
+                        <option value="Active">Active Client</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Successful Sale">Successful Sale</option>
+                    </select>
+                </div>
+
+                <div class="client-list" id="full-client-list">
+                    <!-- Client items will be injected here -->
+                </div>
+
+                <button class="glass-btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="navigate('add-client')">
+                    <i data-feather="plus-circle"></i> Add New Client
+                </button>
+            </div>
+        </div>
+
+        <div class="page" data-page="add-client">
+            <h1><span id="client-form-title">Add New Client</span></h1>
+            <form class="glass-section" id="client-form">
+                <input type="hidden" id="client-id">
+
+                <div class="flex-row">
+                    <div>
+                        <label for="name">Name</label>
+                        <input type="text" id="name" required placeholder="Client Name">
+                    </div>
+                    <div>
+                        <label for="phone">Phone</label>
+                        <input type="tel" id="phone" required placeholder="+1 (555) 123-4567">
+                    </div>
+                </div>
+
+                <div class="flex-row">
+                    <div>
+                        <label for="category">Business/Industry Category</label>
+                        <input type="text" id="category" placeholder="e.g., Real Estate, Retail, Media">
+                    </div>
+                    <div>
+                        <label for="status">Client Status</label>
+                        <select id="status" required>
+                            <option value="Lead">Prospective Lead</option>
+                            <option value="Active" selected>Active Client</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Successful Sale">Successful Sale</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- NEW FEATURE: TAGS -->
+                <label for="tags">Tags (Separate with commas)</label>
+                <input type="text" id="tags" placeholder="e.g., VIP, Investment, Design">
+
+                <label for="preferred-contact">Preferred Contact Times (e.g., Mon-Wed 10-12 PM)</label>
+                <input type="text" id="preferred-contact" placeholder="Mon-Wed 10-12 PM">
+
+                <label for="meeting-datetime">Meeting Date/Time (Optional)</label>
+                <input type="datetime-local" id="meeting-datetime">
+
+                <label for="notes">Notes</label>
+                <textarea id="notes" rows="3" placeholder="Detailed notes about the client or project goals."></textarea>
+
+                <div class="flex-row" id="form-actions">
+                    <button type="submit" class="glass-btn btn-primary"><i data-feather="save"></i> Save Client</button>
+                    <button type="button" class="glass-btn btn-delete" id="delete-client-btn" style="display: none;"><i data-feather="trash-2"></i> Delete Client</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- -------------------------------------------------------------------
+        * 3. CLIENT PROFILE (Detailed View)
+        * ------------------------------------------------------------------- -->
+        <div class="page" data-page="client-profile">
+            <button class="glass-btn" onclick="navigate('client-list')" style="margin-bottom: 20px;"><i data-feather="arrow-left"></i> Back to Clients</button>
+            <div class="glass-section">
+                <div class="client-profile-header">
+                    <div class="client-avatar" id="profile-avatar">J</div>
+                    <div style="flex-grow: 1; text-align: left;">
+                        <h1 id="profile-name" style="text-align: left;">Client Name</h1>
+                        <p id="profile-phone" style="opacity: 0.7; margin-bottom: 5px;"></p>
+                        <span id="profile-status-badge" class="client-status-badge"></span>
+                        <button class="glass-btn" style="margin-left: 10px; padding: 5px 10px;" onclick="editClient()"><i data-feather="edit-2" style="width: 14px; height: 14px;"></i> Edit</button>
+                        <!-- NEW: Client Tags Display -->
+                        <div class="tag-list" id="profile-tags"></div>
+                    </div>
+                </div>
+
+                <div class="grid-3" style="margin-bottom: 20px;">
+                    <div class="glass-card">
+                        <p style="margin:0; font-size: 0.8rem; opacity: 0.6;">Engagement Score</p>
+                        <p id="profile-score" style="font-size: 1.8rem; font-weight: 700; color: var(--color-secondary);">0</p>
+                    </div>
+                    <div class="glass-card">
+                        <p style="margin:0; font-size: 0.8rem; opacity: 0.6;">Category</p>
+                        <p id="profile-category" style="font-size: 1.2rem; font-weight: 500;"></p>
+                    </div>
+                    <div class="glass-card">
+                        <p style="margin:0; font-size: 0.8rem; opacity: 0.6;">Last Interaction</p>
+                        <p id="profile-last-interaction" style="font-size: 0.9rem; font-weight: 500;"></p>
+                    </div>
+                </div>
+
+                <h2>Log Interaction</h2>
+                <div class="flex-row">
+                    <button class="glass-btn btn-primary" onclick="logInteraction('call')"><i data-feather="phone"></i> Call</button>
+                    <button class="glass-btn btn-primary" onclick="logInteraction('message')"><i data-feather="message-square"></i> Message</button>
+                    <button class="glass-btn btn-primary" onclick="logInteraction('meeting')"><i data-feather="calendar"></i> Meeting</button>
+                    <button class="glass-btn btn-primary" onclick="logInteraction('follow-up')"><i data-feather="refresh-cw"></i> Follow-up</button>
+                    <button class="glass-btn btn-primary" onclick="logInteraction('successful sale')"><i data-feather="award"></i> Successful Sale!</button>
+                </div>
+
+                <h2>Interaction History (<span id="interaction-count">0</span>)</h2>
+                <div class="interaction-log" id="interaction-history">
+                    <!-- Interaction items injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- -------------------------------------------------------------------
+        * 4. TASK MANAGEMENT (NEW PAGE)
+        * ------------------------------------------------------------------- -->
+        <div class="page" data-page="tasks">
+            <h1>Task and Follow-up Management</h1>
+
+            <div class="glass-section">
+                <h2>Add New Task</h2>
+                <form id="task-form">
+                    <label for="task-text">Task Description</label>
+                    <input type="text" id="task-text" required placeholder="Follow up on the visual identity design quote.">
+
+                    <div class="flex-row">
+                        <div>
+                            <label for="task-datetime">Due Date</label>
+                            <input type="datetime-local" id="task-datetime" required>
+                        </div>
+                        <div>
+                            <label for="task-client">Related Client (Optional)</label>
+                            <select id="task-client"></select>
+                        </div>
+                    </div>
+                    <button type="submit" class="glass-btn btn-primary"><i data-feather="send"></i> Schedule Task</button>
+                </form>
+            </div>
+
+            <div class="glass-section">
+                <h2>Pending Tasks (<span id="pending-tasks-count">0</span>)</h2>
+                <div class="task-list" id="pending-tasks-list">
+                    <!-- Pending tasks injected here -->
+                </div>
+
+                <h2>Completed Tasks (<span id="completed-tasks-count">0</span>)</h2>
+                <div class="task-list" id="completed-tasks-list">
+                    <!-- Completed tasks injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- -------------------------------------------------------------------
+        * 5. ADVANCED ANALYTICS DASHBOARD
+        * ------------------------------------------------------------------- -->
+        <div class="page" data-page="analytics">
+            <h1>Advanced Analytics</h1>
+            <div class="glass-section grid-3">
+                <div class="glass-card">
+                    <h2>Best Engagement Hour</h2>
+                    <p id="best-hour-stat" style="font-size: 1.8rem; font-weight: 700; color: var(--color-secondary);">--</p>
+                    <p style="margin:0; font-size: 0.8rem; opacity: 0.6;">The most common time for interactions to be logged.</p>
+                </div>
+                <div class="glass-card">
+                    <h2>Avg. Response Time (Mock)</h2>
+                    <p id="avg-response-time-stat" style="font-size: 1.8rem; font-weight: 700; color: #FFC107;">--</p>
+                    <p style="margin:0; font-size: 0.8rem; opacity: 0.6;">Simulated average time from follow-up to response.</p>
+                </div>
+                <div class="glass-card">
+                    <h2>Most Active Day</h2>
+                    <p id="best-day-stat" style="font-size: 1.8rem; font-weight: 700; color: var(--color-text);">--</p>
+                    <p style="margin:0; font-size: 0.8rem; opacity: 0.6;">The day with the highest volume of interactions.</p>
+                </div>
+            </div>
+
+            <div class="glass-section">
+                <h2>Client Status Funnel</h2>
+                <div class="chart-container"><canvas id="statusDistributionChart"></canvas></div>
+            </div>
+
+            <div class="glass-section">
+                <h2>Engagement Heatmap (By Hour)</h2>
+                <div class="chart-container"><canvas id="engagementHeatmap"></canvas></div>
+            </div>
+        </div>
+
+        <!-- -------------------------------------------------------------------
+        * 6. NOTIFICATION CENTER
+        * ------------------------------------------------------------------- -->
+        <div class="page" data-page="notifications">
+            <h1>Notification Center</h1>
+
+            <div class="glass-section">
+                <h2>Add Custom Reminder</h2>
+                <form id="reminder-form">
+                    <label for="reminder-text">Reminder/Task</label>
+                    <input type="text" id="reminder-text" required placeholder="Follow up with Client X on the new proposal.">
+
+                    <div class="flex-row">
+                        <div>
+                            <label for="reminder-datetime">Reminder Date/Time</label>
+                            <input type="datetime-local" id="reminder-datetime" required>
+                        </div>
+                        <div>
+                            <label for="reminder-client">Related Client (Optional)</label>
+                            <select id="reminder-client"></select>
+                        </div>
+                    </div>
+                    <button type="submit" class="glass-btn btn-primary"><i data-feather="send"></i> Schedule Reminder</button>
+                </form>
+            </div>
+
+            <div class="glass-section">
+                <h2>Scheduled and Past Notifications</h2>
+                <div id="notification-list">
+                    <!-- Notifications will be injected here -->
+                    <!-- The no-notifications-msg element was removed from here and is now handled dynamically in renderNotifications to fix the error. -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM NAVIGATION BAR -->
+    <div class="tab-bar">
+        <div class="tab-item active" data-nav="dashboard" onclick="navigate('dashboard')">
+            <i data-feather="home"></i> Dashboard
+        </div>
+        <div class="tab-item" data-nav="client-list" onclick="navigate('client-list')">
+            <i data-feather="users"></i> Clients
+        </div>
+        <!-- NEW TAB ITEM -->
+        <div class="tab-item" data-nav="tasks" onclick="navigate('tasks')">
+            <i data-feather="check-square"></i> Tasks
+        </div>
+        <div class="tab-item" data-nav="analytics" onclick="navigate('analytics')">
+            <i data-feather="bar-chart-2"></i> Analytics
+        </div>
+        <div class="tab-item" data-nav="notifications" onclick="navigate('notifications')">
+            <i data-feather="bell"></i> Notifications
+        </div>
+        <div class="tab-item" data-nav="settings" onclick="showModal('settings-modal')">
+            <i data-feather="settings"></i> Settings
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal (Glass Panel) -->
+<div class="glass-panel" id="settings-modal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; max-width: 400px; width: 90%; display: none;">
+    <h2>Settings</h2>
+    <p style="color: var(--color-secondary);">Manage Application Data</p>
+    <button class="glass-btn btn-delete" style="width: 100%;" onclick="clearAllData()"><i data-feather="alert-triangle"></i> Clear All Local Data (Reset)</button>
+    <button class="glass-btn" style="width: 100%; margin-top: 10px;" onclick="hideModal('settings-modal')">Close</button>
+</div>
+
+<!-- Message Box Modal (Custom Alert/Confirm) -->
+<div class="glass-panel" id="message-modal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 101; max-width: 350px; width: 90%; display: none;">
+    <h3 id="message-modal-title" style="margin-top: 0; text-align: left;"></h3>
+    <p id="message-modal-body" style="text-align: left;"></p>
+    <div id="message-modal-actions" style="display: flex; justify-content: flex-start; gap: 10px;">
+        <button class="glass-btn" onclick="hideModal('message-modal')">OK</button>
+    </div>
+</div>
+
+
+<script>
+    // -------------------------------------------------------------------
+    // CORE APPLICATION SETUP & STORAGE
+    // -------------------------------------------------------------------
+
+    let clients = [];
+    let notifications = [];
+    let tasks = [];
+    const STORAGE_KEY_CLIENTS = 'daad_crm_clients_v2';
+    const STORAGE_KEY_NOTIFICATIONS = 'daad_crm_notifications_v2';
+    const STORAGE_KEY_TASKS = 'daad_crm_tasks_v2';
+    const CHART_COLORS = ['#E0D6BC', '#501323', '#F2E8D8', '#a0324a', '#8b5e6e', '#7e1e36'];
+
+    // Function to load all data from localStorage
+    function loadData() {
+        try {
+            const clientsData = localStorage.getItem(STORAGE_KEY_CLIENTS);
+            const notifData = localStorage.getItem(STORAGE_KEY_NOTIFICATIONS);
+            const tasksData = localStorage.getItem(STORAGE_KEY_TASKS);
+
+            clients = clientsData ? JSON.parse(clientsData) : [];
+            notifications = notifData ? JSON.parse(notifData) : [];
+            tasks = tasksData ? JSON.parse(tasksData) : [];
+
+        } catch (e) {
+            console.error("Error loading data from localStorage:", e);
+        }
+        // Ensure all clients have required structures
+        clients.forEach(c => {
+            if (!c.notificationsSent) c.notificationsSent = {};
+            if (!c.interactions) c.interactions = [];
+            if (typeof c.engagementScore === 'undefined') c.engagementScore = 0;
+            if (!c.tags) c.tags = [];
+        });
+        tasks.forEach(t => {
+            if (typeof t.notificationSent === 'undefined') t.notificationSent = false;
+        });
+        notifications.forEach(n => { if (typeof n.sent === 'undefined') n.sent = false; });
+    }
+
+    // Function to save all data to localStorage
+    function saveData() {
+        try {
+            localStorage.setItem(STORAGE_KEY_CLIENTS, JSON.stringify(clients));
+            localStorage.setItem(STORAGE_KEY_NOTIFICATIONS, JSON.stringify(notifications));
+            localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
+        } catch (e) {
+            console.error("Error saving data to localStorage:", e);
+            showMessage('Error', 'Could not save data. Local storage might be full.', 'alert');
+        }
+    }
+
+    // -------------------------------------------------------------------
+    // UI & ROUTING
+    // -------------------------------------------------------------------
+
+    let currentClientId = null;
+    let currentChart = null;
+    let statusChart = null;
+    let interactionChart = null;
+
+    // Helper to switch pages
+    function navigate(pageName) {
+        document.querySelectorAll('.page').forEach(page => {
+            page.classList.remove('active');
+        });
+        document.querySelector(`.page[data-page="${pageName}"]`).classList.add('active');
+
+        document.querySelectorAll('.tab-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        const navItem = document.querySelector(`.tab-item[data-nav="${pageName}"]`);
+        if (navItem) {
+            navItem.classList.add('active');
+        }
+
+        // Trigger specific render functions on page load
+        if (pageName === 'dashboard') {
+            renderDashboard();
+        } else if (pageName === 'client-list') {
+            renderClientList();
+        } else if (pageName === 'analytics') {
+            renderAnalytics();
+        } else if (pageName === 'notifications') {
+            renderNotifications();
+            populateReminderClientSelect();
+        } else if (pageName === 'tasks') {
+            renderTasks();
+            populateTaskClientSelect();
+        } else if (pageName === 'add-client') {
+             // Reset form when navigating to a fresh 'Add Client' page
+            document.getElementById('client-form').reset();
+            document.getElementById('client-form-title').textContent = 'Add New Client';
+            document.getElementById('client-id').value = '';
+            document.getElementById('delete-client-btn').style.display = 'none';
+        }
+
+        // Re-feather icons on page change
+        feather.replace();
+    }
+
+    // Custom Modal/Alert System
+    function showModal(id, title = '', body = '', actions = '<button class="glass-btn" onclick="hideModal(\'message-modal\')">OK</button>') {
+        const modal = document.getElementById(id);
+        if (id === 'message-modal') {
+            document.getElementById('message-modal-title').textContent = title;
+            document.getElementById('message-modal-body').innerHTML = body;
+            document.getElementById('message-modal-actions').innerHTML = actions;
+        }
+        modal.style.display = 'block';
+    }
+
+    function hideModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    function showMessage(title, message, type = 'info', confirmCallback = null) {
+        let actions = '';
+        if (confirmCallback) {
+            actions = `
+                <button class="glass-btn" onclick="hideModal('message-modal');">Cancel</button>
+                <button class="glass-btn btn-primary" onclick="hideModal('message-modal'); ${confirmCallback}()">Confirm</button>
+            `;
+        } else {
+            actions = `<button class="glass-btn" onclick="hideModal('message-modal')">OK</button>`;
+        }
+        showModal('message-modal', title, message, actions);
+    }
+
+    // -------------------------------------------------------------------
+    // CLIENT MANAGEMENT
+    // -------------------------------------------------------------------
+
+    document.getElementById('client-form').addEventListener('submit', handleClientSubmit);
+    document.getElementById('delete-client-btn').addEventListener('click', () => {
+        showMessage('Confirm Deletion', 'Are you sure you want to delete this client? This action cannot be undone.', 'confirm', 'deleteClient');
+    });
+
+    function generateId() {
+        return Math.random().toString(36).substring(2, 9);
+    }
+
+    function handleClientSubmit(e) {
+        e.preventDefault();
+
+        const id = document.getElementById('client-id').value || generateId();
+        const isEdit = !!document.getElementById('client-id').value;
+
+        // Process Tags
+        const tagsInput = document.getElementById('tags').value;
+        const processedTags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+
+        const newClient = {
+            id: id,
+            name: document.getElementById('name').value,
+            phone: document.getElementById('phone').value,
+            category: document.getElementById('category').value,
+            status: document.getElementById('status').value,
+            tags: processedTags,
+            contactTimes: document.getElementById('preferred-contact').value,
+            meeting: document.getElementById('meeting-datetime').value,
+            notes: document.getElementById('notes').value,
+            engagementScore: 0,
+            interactions: [],
+            notificationsSent: {}
+        };
+
+        if (isEdit) {
+            const index = clients.findIndex(c => c.id === id);
+            if (index !== -1) {
+                // Preserve engagement score, interactions, and notificationsSent during edit
+                newClient.engagementScore = clients[index].engagementScore || 0;
+                newClient.interactions = clients[index].interactions || [];
+                newClient.notificationsSent = clients[index].notificationsSent || {};
+                clients[index] = newClient;
+                showMessage('Success', `Client ${newClient.name} updated successfully.`);
+            }
+        } else {
+            clients.push(newClient);
+            showMessage('Success', `New client ${newClient.name} added successfully.`, 'info', () => {
+                navigate('client-list');
+            });
+        }
+
+        saveData();
+        document.getElementById('client-form').reset();
+        navigate('client-list');
+    }
+
+    function renderClientList() {
+        const listContainer = document.getElementById('full-client-list');
+        const searchInput = document.getElementById('client-search').value.toLowerCase();
+        const filterStatus = document.getElementById('client-filter-status').value;
+        listContainer.innerHTML = '';
+
+        const filteredClients = clients.filter(c => {
+            // Check for search input in name, phone, or tags
+            const tagsString = c.tags ? c.tags.join(' ').toLowerCase() : '';
+            const matchesSearch = c.name.toLowerCase().includes(searchInput) ||
+                                  c.phone.includes(searchInput) ||
+                                  tagsString.includes(searchInput);
+            const matchesStatus = !filterStatus || c.status === filterStatus;
+            return matchesSearch && matchesStatus;
+        }).sort((a, b) => b.engagementScore - a.engagementScore); // Sort by engagement score
+
+        if (filteredClients.length === 0) {
+            listContainer.innerHTML = `<p style="text-align: center; opacity: 0.6;">No clients match the criteria.</p>`;
+            return;
+        }
+
+        filteredClients.forEach(client => {
+            const lastInteraction = client.interactions.length > 0
+                ? new Date(client.interactions[client.interactions.length - 1].timestamp).toLocaleString('en-US')
+                : 'Never';
+
+            const statusClass = client.status.toLowerCase().replace(' ', '-');
+            const tagsHtml = client.tags.map(tag => `<span class="tag" style="margin-right: 5px;">#${tag}</span>`).join('');
+
+            listContainer.innerHTML += `
+                <div class="client-item" onclick="viewClient('${client.id}')">
+                    <div class="client-info" style="text-align: left;">
+                        <h3>${client.name}</h3>
+                        <p>${client.phone} | ${client.category || 'N/A'}</p>
+                        <div style="font-size: 0.75rem; color: var(--color-text); opacity: 0.7;">
+                            Last Interaction: ${lastInteraction}
+                            ${tagsHtml}
+                        </div>
+                    </div>
+                    <span class="client-status-badge status-${statusClass}">${getStatusLabel(client.status)}</span>
+                </div>
+            `;
+        });
+        feather.replace();
+    }
+
+    function getStatusLabel(status) {
+        switch (status) {
+            case 'Lead': return 'Prospective Lead';
+            case 'Active': return 'Active Client';
+            case 'Inactive': return 'Inactive';
+            case 'Successful Sale': return 'Successful Sale';
+            default: return status;
+        }
+    }
+
+    function viewClient(id) {
+        const client = clients.find(c => c.id === id);
+        if (!client) return;
+
+        currentClientId = id;
+
+        document.getElementById('profile-avatar').textContent = client.name.charAt(0).toUpperCase();
+        document.getElementById('profile-name').textContent = client.name;
+        document.getElementById('profile-phone').textContent = client.phone;
+        document.getElementById('profile-category').textContent = client.category || 'General';
+        document.getElementById('profile-score').textContent = client.engagementScore.toFixed(0);
+
+        const statusBadge = document.getElementById('profile-status-badge');
+        const statusClass = client.status.toLowerCase().replace(' ', '-');
+        statusBadge.textContent = getStatusLabel(client.status);
+        statusBadge.className = `client-status-badge status-${statusClass}`;
+
+        const lastInteraction = client.interactions.length > 0
+            ? new Date(client.interactions[client.interactions.length - 1].timestamp).toLocaleString('en-US')
+            : 'N/A';
+        document.getElementById('profile-last-interaction').textContent = lastInteraction;
+
+        // Display Tags
+        const tagsContainer = document.getElementById('profile-tags');
+        tagsContainer.innerHTML = client.tags.map(tag => `<span class="tag">#${tag}</span>`).join('');
+
+        renderInteractionHistory(client);
+
+        navigate('client-profile');
+    }
+
+    function editClient() {
+        const client = clients.find(c => c.id === currentClientId);
+        if (!client) return;
+
+        document.getElementById('client-form-title').textContent = `Editing Client: ${client.name}`;
+        document.getElementById('client-id').value = client.id;
+        document.getElementById('name').value = client.name;
+        document.getElementById('phone').value = client.phone;
+        document.getElementById('category').value = client.category;
+        document.getElementById('status').value = client.status;
+        document.getElementById('tags').value = client.tags.join(', ');
+        document.getElementById('preferred-contact').value = client.contactTimes;
+        document.getElementById('meeting-datetime').value = client.meeting || '';
+        document.getElementById('notes').value = client.notes;
+
+        document.getElementById('delete-client-btn').style.display = 'inline-flex';
+
+        navigate('add-client');
+    }
+
+    function deleteClient() {
+        if (!currentClientId) return;
+
+        clients = clients.filter(c => c.id !== currentClientId);
+        saveData();
+        currentClientId = null;
+        showMessage('Deleted', 'Client has been permanently deleted.');
+        navigate('client-list');
+    }
+
+    // -------------------------------------------------------------------
+    // INTERACTION TRACKING
+    // -------------------------------------------------------------------
+
+    function getInteractionScore(type) {
+        switch (type) {
+            case 'successful sale': return 100;
+            case 'meeting': return 25;
+            case 'call': return 10;
+            case 'message': return 5;
+            case 'follow-up': return 2;
+            default: return 0;
+        }
+    }
+
+    function logInteraction(type) {
+        const client = clients.find(c => c.id === currentClientId);
+        if (!client) return;
+
+        const timestamp = new Date().toISOString();
+        const score = getInteractionScore(type);
+
+        // 1. Log the interaction
+        client.interactions.push({ type, timestamp });
+
+        // 2. Update engagement score
+        client.engagementScore += score;
+
+        // 3. Update client status for successful sale
+        if (type === 'successful sale') {
+            client.status = 'Successful Sale';
+        }
+
+        saveData();
+        renderInteractionHistory(client);
+        viewClient(client.id); // Re-render the profile to update score/stats
+        showMessage('Interaction Logged', `Logged a ${getInteractionTypeLabel(type)}. Engagement Score +${score}.`);
+    }
+
+    function getInteractionTypeLabel(type) {
+        switch (type) {
+            case 'call': return 'Call';
+            case 'message': return 'Message';
+            case 'meeting': return 'Meeting';
+            case 'follow-up': return 'Follow-up';
+            case 'successful sale': return 'Successful Sale';
+            default: return type;
+        }
+    }
+
+    function renderInteractionHistory(client) {
+        const historyContainer = document.getElementById('interaction-history');
+        historyContainer.innerHTML = '';
+        document.getElementById('interaction-count').textContent = client.interactions.length;
+
+        if (client.interactions.length === 0) {
+            historyContainer.innerHTML = `<p style="text-align: center; opacity: 0.6;">No interactions logged yet.</p>`;
+            return;
+        }
+
+        // Display newest first
+        [...client.interactions].reverse().forEach(interaction => {
+            const timeAgo = formatTimeAgo(new Date(interaction.timestamp));
+            historyContainer.innerHTML += `
+                <div class="interaction-item">
+                    <div>
+                        <i data-feather="${getInteractionIcon(interaction.type)}" style="width: 16px; height: 16px; margin-right: 5px;"></i>
+                        <strong>${getInteractionTypeLabel(interaction.type)}</strong>
+                    </div>
+                    <span>${timeAgo} ago</span>
+                </div>
+            `;
+        });
+        feather.replace();
+    }
+
+    function getInteractionIcon(type) {
+        switch (type) {
+            case 'call': return 'phone';
+            case 'message': return 'message-square';
+            case 'meeting': return 'calendar';
+            case 'follow-up': return 'refresh-cw';
+            case 'successful sale': return 'award';
+            default: return 'activity';
+        }
+    }
+
+    // -------------------------------------------------------------------
+    // TASK MANAGEMENT
+    // -------------------------------------------------------------------
+
+    document.getElementById('task-form').addEventListener('submit', handleTaskSubmit);
+
+    function populateTaskClientSelect() {
+        const select = document.getElementById('task-client');
+        select.innerHTML = '<option value="">-- No Client Selected --</option>';
+
+        clients.sort((a, b) => a.name.localeCompare(b.name)).forEach(client => {
+            const option = document.createElement('option');
+            option.value = client.id;
+            option.textContent = client.name;
+            select.appendChild(option);
+        });
+    }
+
+    function handleTaskSubmit(e) {
+        e.preventDefault();
+        const text = document.getElementById('task-text').value;
+        const datetime = document.getElementById('task-datetime').value;
+        const clientSelect = document.getElementById('task-client');
+        const clientId = clientSelect.value;
+        const clientName = clientId ? clientSelect.options[clientSelect.selectedIndex].text : null;
+
+        if (new Date(datetime).getTime() < Date.now()) {
+             showMessage('Error', 'Cannot set a task for a time in the past.');
+             return;
+        }
+
+        tasks.push({
+            id: generateId(),
+            text,
+            datetime,
+            clientId,
+            clientName,
+            completed: false,
+            notificationSent: false,
+            createdAt: new Date().toISOString()
+        });
+
+        saveData();
+        renderTasks();
+        this.reset();
+        showMessage('Success', 'Task scheduled successfully.');
+    }
+
+    function renderTasks() {
+        const pendingList = document.getElementById('pending-tasks-list');
+        const completedList = document.getElementById('completed-tasks-list');
+        pendingList.innerHTML = '';
+        completedList.innerHTML = '';
+
+        const pendingTasks = tasks.filter(t => !t.completed).sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+        const completedTasks = tasks.filter(t => t.completed).sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+
+        document.getElementById('pending-tasks-count').textContent = pendingTasks.length;
+        document.getElementById('completed-tasks-count').textContent = completedTasks.length;
+        document.getElementById('pending-tasks-stat').textContent = pendingTasks.length; // Update dashboard stat
+
+        const renderTaskItem = (task) => {
+            const date = new Date(task.datetime).toLocaleString('en-US');
+            const clientLink = task.clientId ? `<a href="#" onclick="viewClient('${task.clientId}'); return false;" style="color: var(--color-secondary); text-decoration: underline;">${task.clientName}</a>` : 'General Task';
+            const dueClass = new Date(task.datetime).getTime() < Date.now() && !task.completed ? 'style="color: #F44336; font-weight: 600;"' : '';
+
+            return `
+                <div class="task-item ${task.completed ? 'completed' : ''}">
+                    <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask('${task.id}')" style="width: 20px; height: 20px; margin-right: 15px; flex-shrink: 0;">
+                    <div class="task-info">
+                        <h4>${task.text}</h4>
+                        <p>
+                            Client: ${clientLink}
+                            <br>
+                            <span ${dueClass}>Due: ${date}</span>
+                        </p>
+                    </div>
+                    <div class="task-action">
+                        <button class="glass-btn btn-delete" style="padding: 5px 10px;" onclick="deleteTask('${task.id}')"><i data-feather="trash-2" style="width: 14px; height: 14px;"></i></button>
+                    </div>
+                </div>
+            `;
+        };
+
+        pendingList.innerHTML = pendingTasks.map(renderTaskItem).join('') || `<p style="text-align: center; opacity: 0.6;">No pending tasks.</p>`;
+        completedList.innerHTML = completedTasks.map(renderTaskItem).join('') || `<p style="text-align: center; opacity: 0.6;">No completed tasks.</p>`;
+
+        feather.replace();
+    }
+
+    function toggleTask(id) {
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+            task.completed = !task.completed;
+            saveData();
+            renderTasks();
+            showMessage('Task Update', task.completed ? 'Task marked as completed.' : 'Task reopened.');
+        }
+    }
+
+    function deleteTask(id) {
+        showMessage('Confirm Deletion', 'Are you sure you want to delete this task?', 'confirm', `performDeleteTask('${id}')`);
+    }
+
+    function performDeleteTask(id) {
+        tasks = tasks.filter(t => t.id !== id);
+        saveData();
+        renderTasks();
+    }
+
+
+    // -------------------------------------------------------------------
+    // SMART NOTIFICATIONS SYSTEM
+    // -------------------------------------------------------------------
+
+    const CHECK_INTERVAL = 30000; // 30 seconds
+
+    // 1. Request Notification Permission
+    function requestNotificationPermission() {
+        if (!("Notification" in window)) {
+            showMessage('Error', 'Your browser does not support desktop notifications.');
+            return;
+        }
+
+        Notification.requestPermission().then(permission => {
+            updatePermissionStatus(permission);
+        });
+    }
+
+    function updatePermissionStatus(permission = Notification.permission) {
+        const statusEl = document.getElementById('permission-status');
+        if (permission === 'granted') {
+            statusEl.textContent = 'Notifications: On';
+            statusEl.style.color = '#4CAF50';
+        } else if (permission === 'denied') {
+            statusEl.textContent = 'Notifications: Blocked';
+            statusEl.style.color = '#F44336';
+        } else {
+            statusEl.textContent = 'Notifications: Off';
+            statusEl.style.color = '#FFC107';
+        }
+    }
+
+    // 2. Notification Logic Engine (runs every 30 seconds)
+    function startNotificationEngine() {
+        setInterval(() => {
+            if (Notification.permission !== 'granted') return;
+
+            checkMeetingReminders();
+            checkGeneralReminders();
+            checkTaskReminders();
+
+        }, CHECK_INTERVAL);
+    }
+
+    // Check Meeting Reminders
+    function checkMeetingReminders() {
+        const now = Date.now();
+
+        clients.forEach(client => {
+            if (!client.meeting) return;
+
+            const meetingTime = new Date(client.meeting).getTime();
+            const meetingKey = client.meeting;
+
+            // --- 30 Minute Reminder Check ---
+            const reminderTime = meetingTime - 30 * 60 * 1000;
+            const reminderSentKey = `${meetingKey}_30min`;
+
+            if (now >= reminderTime && now < meetingTime && !client.notificationsSent[reminderSentKey]) {
+                const notification = new Notification(`Upcoming Meeting Reminder: ${client.name}`, {
+                    body: `Your meeting with ${client.name} is in 30 minutes! (${new Date(meetingTime).toLocaleTimeString('en-US')})`,
+                    icon: 'https://i.ibb.co/JRdPfZF3/image.png',
+                    sound: 'default'
+                });
+                client.notificationsSent[reminderSentKey] = true;
+                saveData();
+            }
+
+            // --- At Meeting Time Check ---
+            const tolerance = 60000; // 1 minute window for "at time"
+            const alertSentKey = `${meetingKey}_alert`;
+
+            if (now >= meetingTime - tolerance && now <= meetingTime + tolerance && !client.notificationsSent[alertSentKey]) {
+                const notification = new Notification(`Meeting Alert: ${client.name}`, {
+                    body: `It's time for your meeting with ${client.name}!`,
+                    icon: 'https://i.ibb.co/JRdPfZF3/image.png',
+                    sound: 'default'
+                });
+                client.notificationsSent[alertSentKey] = true;
+                saveData();
+            }
+        });
+    }
+
+    function checkTaskReminders() {
+        const now = Date.now();
+
+        tasks.forEach(task => {
+            if (task.completed || task.notificationSent) return;
+
+            const dueTime = new Date(task.datetime).getTime();
+            const tolerance = 60000; // 1 minute window
+
+            if (now >= dueTime - tolerance && now <= dueTime + tolerance) {
+                const notification = new Notification(`Task Due: ${task.text}`, {
+                    body: task.clientName ? `This task is related to client: ${task.clientName}.` : 'A general task is now due.',
+                    icon: 'https://i.ibb.co/JRdPfZF3/image.png',
+                    sound: 'default'
+                });
+                task.notificationSent = true;
+            }
+        });
+
+        saveData(); // Save changes to tasks (notificationSent flag)
+    }
+
+    // Check General Reminders
+    function checkGeneralReminders() {
+        const now = Date.now();
+        const activeNotifications = [];
+
+        notifications.forEach(notif => {
+            const reminderTime = new Date(notif.datetime).getTime();
+            const tolerance = 60000;
+
+            if (now >= reminderTime - tolerance && now <= reminderTime + tolerance && !notif.sent) {
+                const notification = new Notification(`General Reminder: ${notif.text}`, {
+                    body: notif.clientName ? `Follow-up with client ${notif.clientName}.` : 'General task reminder.',
+                    icon: 'https://i.ibb.co/JRdPfZF3/image.png',
+                    sound: 'default'
+                });
+                notif.sent = true;
+            }
+
+            // Keep notification for up to 7 days after it was due/sent
+            if (now - reminderTime < 3600000 * 24 * 7 || !notif.sent) {
+                activeNotifications.push(notif);
+            }
+        });
+
+        notifications = activeNotifications;
+        saveData();
+        renderNotifications();
+    }
+
+    // Add Custom Reminder
+    document.getElementById('reminder-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const text = document.getElementById('reminder-text').value;
+        const datetime = document.getElementById('reminder-datetime').value;
+        const clientSelect = document.getElementById('reminder-client');
+        const clientId = clientSelect.value;
+        const clientName = clientSelect.options[clientSelect.selectedIndex].text;
+
+        if (new Date(datetime).getTime() < Date.now()) {
+             showMessage('Error', 'Cannot set a reminder for a time in the past.');
+             return;
+        }
+
+        notifications.push({
+            id: generateId(),
+            text,
+            datetime,
+            clientId,
+            clientName: clientId ? clientName : null,
+            sent: false,
+            type: 'custom'
+        });
+
+        saveData();
+        renderNotifications();
+        this.reset();
+        showMessage('Success', 'Reminder scheduled successfully.');
+    });
+
+    function populateReminderClientSelect() {
+        const select = document.getElementById('reminder-client');
+        select.innerHTML = '<option value="">-- No Client Selected --</option>';
+
+        clients.sort((a, b) => a.name.localeCompare(b.name)).forEach(client => {
+            const option = document.createElement('option');
+            option.value = client.id;
+            option.textContent = client.name;
+            select.appendChild(option);
+        });
+    }
+
+    function renderNotifications() {
+        const listContainer = document.getElementById('notification-list');
+        listContainer.innerHTML = '';
+
+        const allNotifications = [];
+
+        // 1. Add Custom Reminders
+        notifications.forEach(n => allNotifications.push(n));
+
+        // 2. Add Future Meeting Reminders
+        clients.forEach(c => {
+            if (c.meeting) {
+                const meetingTime = new Date(c.meeting);
+                if (meetingTime.getTime() > Date.now()) {
+                    allNotifications.push({
+                        id: c.id + '_meeting',
+                        text: `Scheduled Meeting with ${c.name}`,
+                        datetime: c.meeting,
+                        clientName: c.name,
+                        type: 'meeting',
+                        sent: false
+                    });
+                }
+            }
+        });
+
+        allNotifications.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+
+        if (allNotifications.length === 0) {
+            listContainer.innerHTML = `<p style="text-align: center; opacity: 0.6; margin-top: 20px;">No custom reminders or meeting notifications.</p>`;
+            return;
+        }
+
+
+        allNotifications.forEach(notif => {
+            const isPast = new Date(notif.datetime).getTime() < Date.now();
+            const statusText = isPast ? 'Alerted' : 'Scheduled';
+            const statusIcon = isPast ? 'check-circle' : 'clock';
+            const itemClass = isPast ? '' : 'unread';
+
+            listContainer.innerHTML += `
+                <div class="notification-item ${itemClass}">
+                    <i data-feather="${statusIcon}" class="notification-icon" style="flex-shrink: 0; margin-right: 10px;"></i>
+                    <div class="notification-text" style="flex-grow: 1; text-align: left;">
+                        <h4>${notif.text}</h4>
+                        <p>${new Date(notif.datetime).toLocaleString('en-US')} (${statusText})</p>
+                    </div>
+                    ${notif.type === 'custom' ? `<button class="glass-btn btn-delete" style="padding: 5px 10px; margin-left: 10px;" onclick="deleteReminder('${notif.id}')"><i data-feather="x" style="width: 14px; height: 14px;"></i></button>` : ''}
+                </div>
+            `;
+        });
+        feather.replace();
+    }
+
+    function deleteReminder(id) {
+        showMessage('Confirm Deletion', 'Delete this custom reminder?', 'confirm', `performDeleteReminder('${id}')`);
+    }
+
+    function performDeleteReminder(id) {
+        notifications = notifications.filter(n => n.id !== id);
+        saveData();
+        renderNotifications();
+    }
+
+    // -------------------------------------------------------------------
+    // ADVANCED ANALYTICS
+    // -------------------------------------------------------------------
+
+    function renderAnalytics() {
+        if (clients.length === 0) {
+            document.getElementById('best-hour-stat').textContent = 'N/A';
+            document.getElementById('avg-response-time-stat').textContent = 'N/A';
+            document.getElementById('best-day-stat').textContent = 'N/A';
+            if (currentChart) currentChart.destroy();
+            if (statusChart) statusChart.destroy();
+            return;
+        }
+
+        const stats = calculateAnalytics(clients);
+
+        // Update Stats
+        document.getElementById('best-hour-stat').textContent = stats.bestEngagementHour;
+        document.getElementById('avg-response-time-stat').textContent = stats.averageResponseTime;
+        document.getElementById('best-day-stat').textContent = stats.mostResponsiveDay;
+
+        // Render Funnel Chart (Client Status Distribution)
+        renderStatusDistributionChart(stats.statusCounts);
+
+        // Render Heatmap Chart (Interactions by Hour)
+        renderHeatmapChart(stats.interactionsByHour);
+    }
+
+    function calculateAnalytics(clients) {
+        const interactionData = clients.flatMap(c => c.interactions);
+        const interactionsByHour = new Array(24).fill(0);
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const dayCounts = new Array(7).fill(0);
+        const statusCounts = {
+            'Lead': 0,
+            'Active': 0,
+            'Inactive': 0,
+            'Successful Sale': 0
+        };
+
+        clients.forEach(c => {
+            statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;
+        });
+
+        interactionData.forEach(interaction => {
+            const date = new Date(interaction.timestamp);
+            const hour = date.getHours();
+            const day = date.getDay();
+
+            // Interactions by Hour
+            interactionsByHour[hour]++;
+
+            // Day Counts
+            dayCounts[day]++;
+        });
+
+        // 1. Best Engagement Hour (Global)
+        const bestHourIndex = interactionsByHour.indexOf(Math.max(...interactionsByHour));
+        const period = bestHourIndex < 12 ? 'AM' : 'PM';
+        const displayHour = bestHourIndex % 12 || 12;
+        const bestEngagementHour = interactionsByHour[bestHourIndex] > 0
+            ? `${displayHour}:00 ${period}`
+            : 'N/A';
+
+        // 2. Most Responsive Day
+        const bestDayIndex = dayCounts.indexOf(Math.max(...dayCounts));
+        const mostResponsiveDay = dayCounts[bestDayIndex] > 0 ? dayNames[bestDayIndex] : 'N/A';
+
+        // 3. Average Response Time (Mocked)
+        const averageResponseTime = interactionData.length > 5 ? '4 hours and 15 minutes' : 'N/A (More data needed)';
+
+        return {
+            bestEngagementHour,
+            mostResponsiveDay,
+            averageResponseTime,
+            interactionsByHour,
+            statusCounts
+        };
+    }
+
+    // Client Status Distribution (Funnel)
+    function renderStatusDistributionChart(data) {
+        const ctx = document.getElementById('statusDistributionChart').getContext('2d');
+        if (statusChart) statusChart.destroy();
+
+        const labels = Object.keys(data).map(getStatusLabel);
+        const values = Object.values(data);
+        const colors = ['#FFC107', '#2196F3', '#F44336', '#4CAF50'];
+
+        statusChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Number of Clients',
+                    data: values,
+                    backgroundColor: colors,
+                    borderColor: 'var(--color-primary)',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(242, 232, 216, 0.1)' }, ticks: { color: 'var(--color-text)' } },
+                    x: { grid: { display: false }, ticks: { color: 'var(--color-text)' } }
+                }
+            }
+        });
+    }
+
+    function renderHeatmapChart(data) {
+        const ctx = document.getElementById('engagementHeatmap').getContext('2d');
+        if (currentChart) currentChart.destroy();
+
+        const hours = Array.from({ length: 24 }, (_, i) => `${i % 12 || 12}${i < 12 ? 'am' : 'pm'}`);
+
+        currentChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: hours,
+                datasets: [{
+                    label: 'Logged Interactions',
+                    data: data,
+                    backgroundColor: data.map(val => val > 0 ? 'rgba(224, 214, 188, 0.6)' : 'rgba(224, 214, 188, 0.1)'),
+                    borderColor: CHART_COLORS[0],
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    hoverBackgroundColor: 'rgba(224, 214, 188, 0.8)',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(242, 232, 216, 0.1)' }, ticks: { color: 'var(--color-text)' } },
+                    x: { grid: { display: false }, ticks: { color: 'var(--color-text)' } }
+                }
+            }
+        });
+    }
+
+    // -------------------------------------------------------------------
+    // DASHBOARD RENDER & UTILITIES
+    // -------------------------------------------------------------------
+
+    function renderDashboard() {
+        // Stats
+        document.getElementById('total-clients-stat').textContent = clients.length;
+        document.getElementById('sales-logged-stat').textContent = clients.filter(c => c.status === 'Successful Sale').length;
+        // Pending tasks stat is updated in renderTasks()
+
+        // Quick Clients (Top 5 by Engagement)
+        const quickList = document.getElementById('quick-clients-list');
+        quickList.innerHTML = ''; // Clear existing content
+
+        if (clients.length === 0) {
+            // Inject the "No clients" message directly if the list is empty (Fixes the TypeError)
+            quickList.innerHTML = `<p style="text-align: center; opacity: 0.6;">No clients yet. Add a client to get started!</p>`;
+            feather.replace();
+            return;
+        }
+
+        const topClients = clients.sort((a, b) => b.engagementScore - a.engagementScore).slice(0, 5);
+
+        topClients.forEach(client => {
+            const statusClass = client.status.toLowerCase().replace(' ', '-');
+            quickList.innerHTML += `
+                <div class="client-item" onclick="viewClient('${client.id}')">
+                    <div class="client-info" style="text-align: left;">
+                        <h3>${client.name}</h3>
+                        <p>Score: ${client.engagementScore.toFixed(0)} | ${client.category || 'N/A'}</p>
+                    </div>
+                    <span class="client-status-badge status-${statusClass}">${getStatusLabel(client.status)}</span>
+                </div>
+            `;
+        });
+        feather.replace();
+    }
+
+    function formatTimeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        let interval = seconds / 31536000;
+
+        if (interval > 1) return Math.floor(interval) + " years";
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + " months";
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + " days";
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + " hours";
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + " minutes";
+        return Math.floor(seconds) + " seconds";
+    }
+
+    // -------------------------------------------------------------------
+    // SYSTEM AND INITIALIZATION
+    // -------------------------------------------------------------------
+
+    function clearAllData() {
+        showMessage('Warning!', 'This will permanently delete ALL client, task, and notification data. Are you sure?', 'confirm', 'performClearAllData');
+    }
+
+    function performClearAllData() {
+        localStorage.removeItem(STORAGE_KEY_CLIENTS);
+        localStorage.removeItem(STORAGE_KEY_NOTIFICATIONS);
+        localStorage.removeItem(STORAGE_KEY_TASKS);
+        loadData();
+        navigate('dashboard');
+        hideModal('settings-modal');
+        showMessage('Success', 'All application data has been cleared.');
+    }
+
+    function init() {
+        loadData();
+        updatePermissionStatus();
+        startNotificationEngine();
+        navigate('dashboard');
+        feather.replace();
+        console.log("DAAD Agency CRM v2 Initialized.");
+
+        // Initial setup for Chart.js
+        Chart.defaults.color = 'var(--color-text)';
+        Chart.defaults.font.family = 'Inter, sans-serif';
+        Chart.defaults.responsive = true;
+        Chart.defaults.maintainAspectRatio = false;
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
